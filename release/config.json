@@ -1,0 +1,7 @@
+{
+  "network": "tcp",
+  "address": "0.0.0.0:12334",
+  "parser": [],
+  "client": {},
+  "stream": {}
+}
