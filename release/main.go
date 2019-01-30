@@ -16,7 +16,7 @@ type LogrusConfig struct {
 
 type Config struct {
 	LogrusConfig LogrusConfig `json:"logger"`
-	SubsurfaceStream subsurface_stream.ServerConfig `json:"stream"`
+	SubsurfaceStream []subsurface_stream.Config `json:"subsurface"`
 }
 
 func (config *LogrusConfig) Init() error {
@@ -45,12 +45,22 @@ func main() {
 		logrus.WithError(err).WithField("config", config.LogrusConfig).Panic("fail to init logrus")
 	}
 
-	ss, err := config.SubsurfaceStream.New()
-	if err != nil {
-		logrus.WithError(err).WithField("config", config.SubsurfaceStream).Panic("fail to create subsurface stream instance")
+	streams := make([]*subsurface_stream.SubsurfaceStream, 0)
+	defer func() {
+		for _, ss := range streams {
+			ss.Close()
+		}
+	}()
+	for _, c := range config.SubsurfaceStream {
+		ss, err := c.New()
+		if err != nil {
+			logrus.WithError(err).WithField("config", c).Panic("fail to init stream")
+		}
+		streams = append(streams, ss)
+		go ss.Run()
+		logrus.WithField("config", c).Debug("run stream")
 	}
-	defer ss.Close()
-	go ss.Run()
+
 	logrus.Info("start subsurface stream")
 	defer logrus.Info("exit subsurface stream")
 

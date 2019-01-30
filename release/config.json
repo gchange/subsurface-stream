@@ -1,7 +1,54 @@
 {
-  "network": "tcp",
-  "address": "0.0.0.0:12334",
-  "parser": [],
-  "client": {},
-  "stream": {}
+  "subsurface": [
+    {
+      "network": "tcp",
+      "address": "0.0.0.0:12334",
+      "config": [
+        {
+          "name": "socks5",
+          "dialer": {
+            "name": "direct"
+          }
+        }
+      ]
+    },
+    {
+      "network": "tcp",
+      "address": "0.0.0.0:12335",
+      "config":[
+        {
+          "name": "socks5",
+          "network": "tcp",
+          "address": "127.0.0.1:1080",
+          "dialer": {
+            "name":"counter",
+            "interval": "1s",
+            "dialer": {
+              "name": "direct"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "network": "tcp",
+      "address": "0.0.0.0:12336",
+      "config": [{
+
+          "name": "courier",
+          "network": "tcp",
+          "address": "127.0.0.1:12335",
+          "ipv4": "ipv4.csv",
+          "ipv6": "ipv6.csv",
+          "dialer": {
+            "name":"counter",
+            "interval": "1m",
+            "dialer": {
+              "name": "direct"
+            }
+          }
+        }
+      ]
+    }
+  ]
 }
